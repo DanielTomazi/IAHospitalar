@@ -11,17 +11,40 @@ import java.util.Scanner;
 
 public class HospitalSystem {
 
-    public static void main(String[] args) {
+    private List<Leito> leitos;
+    private List<Paciente> pacientes;
+
+    public HospitalSystem() {
+        this.leitos = new ArrayList<>();
+        this.pacientes = new ArrayList<>();
+    }
+
+    public void iniciarSistema() {
         Scanner scanner = new Scanner(System.in);
 
         // Gerar leitos hospitalares
-        List<Leito> leitos = gerarLeitos(1);
+        gerarLeitos(1);
 
         // Cadastrar pacientes
-        List<Paciente> pacientes = new ArrayList<>();
+        cadastrarPacientes(scanner);
+
+        // Determinar alocação de pacientes
+        determinarAlocacaoPacientes();
+
+        // Exibir informações dos leitos e pacientes
+        exibirInformacoes();
+    }
+
+    private void gerarLeitos(int quantidade) {
+        for (int i = 1; i <= quantidade; i++) {
+            leitos.add(new Leito(i));
+        }
+    }
+
+    private void cadastrarPacientes(Scanner scanner) {
         boolean cadastrarNovoPaciente = true;
         while (cadastrarNovoPaciente) {
-            Paciente novoPaciente = cadastrarPaciente(scanner, leitos);
+            Paciente novoPaciente = cadastrarPaciente(scanner);
             if (novoPaciente != null) {
                 pacientes.add(novoPaciente);
             }
@@ -32,25 +55,9 @@ public class HospitalSystem {
                 cadastrarNovoPaciente = false;
             }
         }
-
-        // Determinar alocação de pacientes
-        for (Paciente paciente : pacientes) {
-            determinarAlocacaoPaciente(paciente, leitos);
-        }
-
-        // Exibir informações dos leitos e pacientes
-        exibirInformacoes(leitos);
     }
 
-    private static List<Leito> gerarLeitos(int quantidade) {
-        List<Leito> leitos = new ArrayList<>();
-        for (int i = 1; i <= quantidade; i++) {
-            leitos.add(new Leito(i));
-        }
-        return leitos;
-    }
-
-    private static Paciente cadastrarPaciente(Scanner scanner, List<Leito> leitos) {
+    private Paciente cadastrarPaciente(Scanner scanner) {
         System.out.println("Cadastro de Paciente");
         System.out.print("Nome: ");
         String nome = scanner.nextLine();
@@ -107,23 +114,17 @@ public class HospitalSystem {
         }
 
         // Verificar se há leitos disponíveis
-        boolean leitosDisponiveis = false;
-        for (Leito leito : leitos) {
-            if (leito.isDisponivel()) {
-                leitosDisponiveis = true;
-                break;
-            }
-        }
+        boolean leitosDisponiveis = leitos.stream().anyMatch(Leito::isDisponivel);
 
         if (!leitosDisponiveis) {
-            System.out.println("Não há leitos disponíveis. O paciente " + nome + " não pode ser cadastrado.");
+            System.out.println("Não há leitos disponíveis, o sistema irá verificar a locação e a indicação é que o paciente seja alocado ao obtermos liberação de leitos no sistema. O paciente " + nome + " não pode ser cadastrado.");
             return null;
         }
 
         return new Paciente(nome, dataNascimento, idade, cep, endereco, motivoEntrada, diasInternacao);
     }
 
-    private static int determinarDiasInternacao(int opcao) {
+    private int determinarDiasInternacao(int opcao) {
         switch (opcao) {
             case 1:
                 return 5; // Internação cirúrgica
@@ -138,41 +139,29 @@ public class HospitalSystem {
         }
     }
 
-    private static void determinarAlocacaoPaciente(Paciente paciente, List<Leito> leitos) {
+    private void determinarAlocacaoPacientes() {
+        for (Paciente paciente : pacientes) {
+            determinarAlocacaoPaciente(paciente);
+        }
+    }
+
+    private void determinarAlocacaoPaciente(Paciente paciente) {
         // Lógica para determinar a alocação do paciente com base no motivo de entrada
         if (paciente.getDiasInternacao() > 0) {
-            boolean leitosDisponiveis = false;
-            for (Leito leito : leitos) {
-                if (leito.isDisponivel()) {
-                    leitosDisponiveis = true;
-                    leito.alocarPaciente(paciente);
-                    System.out.println("Paciente " + paciente.getNome() + " alocado no leito " + leito.toString());
-                    return;
-                }
-            }
-            // Se não houver leitos disponíveis, verificar se há pacientes internados para calcular o tempo de espera
-            if (!leitosDisponiveis) {
-                boolean pacientesInternados = leitos.stream().anyMatch(leito -> leito.getDiasOcupado() > 0);
-                if (pacientesInternados) {
-                    Leito leitoMenorPermanencia = leitos.stream()
-                            .filter(leito -> leito.getDiasOcupado() > 0)
-                            .min(Comparator.comparingInt(Leito::getDiasOcupado))
-                            .orElse(null);
-                    if (leitoMenorPermanencia != null) {
-                        int diasEspera = leitoMenorPermanencia.getDiasOcupado();
-                        System.out.println("Não há leitos disponíveis para o paciente " + paciente.getNome() +
-                                ". Por favor, aguarde " + diasEspera + " dias para agendar o procedimento.");
-                    }
-                } else {
-                    System.out.println("Não há leitos disponíveis e não há pacientes internados para calcular o tempo de espera.");
-                }
+            boolean leitosDisponiveis = leitos.stream().anyMatch(Leito::isDisponivel);
+            if (leitosDisponiveis) {
+                Leito leitoDisponivel = leitos.stream().filter(Leito::isDisponivel).findFirst().get();
+                leitoDisponivel.alocarPaciente(paciente);
+                System.out.println("Paciente " + paciente.getNome() + " alocado no leito " + leitoDisponivel.getNumero());
+            } else {
+                System.out.println("Não há leitos disponíveis para o paciente " + paciente.getNome());
             }
         } else {
             System.out.println("Paciente " + paciente.getNome() + " não precisa de leito.");
         }
     }
 
-    private static void exibirInformacoes(List<Leito> leitos) {
+    private void exibirInformacoes() {
         // Exibir informações dos leitos e pacientes
         System.out.println("\n--- Informações dos Leitos ---");
         for (Leito leito : leitos) {
@@ -180,7 +169,7 @@ public class HospitalSystem {
         }
     }
 
-    private static String obterEnderecoPorCEP(String cep) {
+    private String obterEnderecoPorCEP(String cep) {
         String url = "https://viacep.com.br/ws/" + cep + "/json/";
         StringBuilder endereco = new StringBuilder();
         try {
@@ -194,5 +183,10 @@ public class HospitalSystem {
             e.printStackTrace();
         }
         return endereco.toString();
+    }
+
+    public static void main(String[] args) {
+        HospitalSystem hospitalSystem = new HospitalSystem();
+        hospitalSystem.iniciarSistema();
     }
 }
