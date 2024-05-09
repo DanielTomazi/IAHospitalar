@@ -22,6 +22,10 @@ public class Leito {
         return diasOcupado;
     }
 
+    public int getNumero() {
+        return numero;
+    }
+
     @Override
     public String toString() {
         if (paciente != null) {
