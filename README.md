@@ -5,7 +5,7 @@ Contribuidores desse projeto:
 
 - Daniel Tomazi - GitHub: DanielTomazi
 - Marcio Galvão - GitHub: MarcioSilva007
-- Marcos Vinicius - GitHub: marcosfrontleal
+- Paulo Henrique - GitHub: PaulofrontHenrique
 - Vitor Macedo Carvalho dos Santos
 - Amilton Jesus dos Santos Junior
 
