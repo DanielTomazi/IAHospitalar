@@ -1,7 +1,7 @@
 # IA Hospitalar
 ![Imagem demonstrando a execução do código](https://github.com/DanielTomazi/IAHospitalar/blob/main/demo-ia-cod.png)
 *********
-Contribuidores desse projeto:
+Members:
 
 - Daniel Tomazi - GitHub: DanielTomazi
 - Marcio Galvão - GitHub: MarcioSilva007
@@ -9,6 +9,6 @@ Contribuidores desse projeto:
 - Vitor Macedo Carvalho dos Santos
 - Amilton Jesus dos Santos Junior
 
-Código back-end que serve como uma IA sistêmica onde o usuário realiza o cadastro de novos pacientes e o próprio sistema devolve informações como idade, endereço e faz a alocação do paciente em um leito hospitalar conforme a necessidade do mesmo. O código realiza uma integração com uma API de busca de CEP que entrega o endereço do CEP mencionado (O código é apenas back-end e foi criado através do IntelliJ).
+Back-end code that serves as a systemic AI, where the user registers new patients, and the system provides information such as age, address, and allocates the patient to a hospital bed based on their needs. The code integrates with a ZIP code search API that returns the address corresponding to the mentioned ZIP code (The code is back-end only and was created using IntelliJ).
 
-Em via de testes a serem realizados, o código pode ter seu número de leitos disponiveis alterados devidos as boas práticas de grasp e solid que foram implantadas no código, basta alterar o número dentro do próprio código, o restante do código não é afetado. (O número padrão de leitos disponiveis é 1)
+As part of ongoing tests, the number of available beds may be adjusted due to the implementation of GRASP and SOLID principles. You can change the number of available beds directly in the code, without affecting the rest of the system. (The default number of available beds is 1).
